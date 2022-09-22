@@ -12,6 +12,16 @@ export class AppService {
     @InjectModel('Player') private readonly playerModel: Model<Player>,
   ) {}
 
+  async getCategoryById(categoryId: string): Promise<Category> {
+    try {
+      const category = await this.categoryModel.findById(categoryId).exec();
+
+      return category;
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
   async createCategory(createCategoryDTO: Category): Promise<Category> {
     try {
       const createdCategory = new this.categoryModel(createCategoryDTO);
