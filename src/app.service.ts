@@ -31,4 +31,14 @@ export class AppService {
       throw new RpcException(error.message);
     }
   }
+
+  async createPlayer(createPLayerDTO: Player): Promise<Player> {
+    try {
+      const createdPlayer = new this.playerModel(createPLayerDTO);
+
+      return createdPlayer.save();
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
 }
