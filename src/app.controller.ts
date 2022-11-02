@@ -34,11 +34,21 @@ export class AppController {
       // mark the message that can be delete from the queue because it was successfully processed
       await channel.ack(originalMessage);
     } catch (error) {
-      ackErrors.map(async (ackError) => {
-        if (error.message.includes(ackError)) {
-          await channel.ack(originalMessage);
-        }
-      });
+      let isHandledError = false;
+
+      await Promise.all(
+        ackErrors.map(async (ackError) => {
+          if (error.message.includes(ackError)) {
+            await channel.ack(originalMessage);
+            isHandledError = true;
+          }
+        }),
+      );
+
+      if (!isHandledError) {
+        // resend the message to the queue to be process again if some error was happen
+        await channel.nack(originalMessage);
+      }
     }
   }
 
